@@ -3,19 +3,16 @@
 
 #define CheckL 0           // для настройки катушки временно установите тут единицу
 #define iButtonPin A3      // Линия data ibutton
-#define R_Led 2            // RGB Led
-#define G_Led 3
-#define B_Led 4
-#define VRpinGnd 5         // Земля подстроечного резистора для аналогового компаратора
+#define R_Led 3            // RGB Led (Красный)
+#define G_Led 4            // RGB Led (Зеленый)
+#define B_Led 5            // RGB Led (Синий)
 #define ACpin 6            // Вход Ain0 аналогового компаратора для EM-Marie
-#define BtnPin 8           // Кнопка переключения режима чтение/запись
-#define BtnPinGnd 9        // Земля кнопки переключения режима 
-#define speakerPin 10       // Спикер, он же buzzer, он же beeper
-#define FreqGen 11         // генератор 125 кГц
-#define speakerPinGnd 12   // земля Спикера
-#define rfidBitRate 2       // Скорость обмена с rfid в kbps
-#define rfidUsePWD 0        // ключ использует пароль для изменения
-#define rfidPWD 123456      // пароль для ключа
+#define BtnPin 10          // Кнопка переключения режима чтение/запись
+#define speakerPin 12      // Спикер, он же buzzer, он же beeper
+#define FreqGen 11         // генератор ШИМ 125 кГц для RFID
+#define rfidBitRate 2        // Скорость обмена с rfid в kbps
+#define rfidUsePWD 0         // ключ использует пароль для изменения
+#define rfidPWD 123456       // пароль для ключа
 
 OneWire ibutton (iButtonPin); 
 byte addr[8];                             // временный буфер
@@ -30,16 +27,15 @@ emkeyType keyType;
 
 void setup() {
   pinMode(BtnPin, INPUT_PULLUP);                            // включаем чтение и подягиваем пин кнопки режима к +5В
-  pinMode(BtnPinGnd, OUTPUT); digitalWrite(BtnPinGnd, LOW); // подключаем второй пин кнопки к земле
-  pinMode(speakerPin, OUTPUT);
-  pinMode(speakerPinGnd, OUTPUT); digitalWrite(speakerPinGnd, LOW); // подключаем второй пин спикера к земле
-  pinMode(ACpin, INPUT);                                            // Вход аналогового компаратора для ключей RFID и аналоговых ключей Cyfral / Metacom
-  pinMode(VRpinGnd, OUTPUT); digitalWrite(VRpinGnd, LOW);           // подключаем пин подстроечного резистора к земле
-  pinMode(R_Led, OUTPUT); pinMode(G_Led, OUTPUT); pinMode(B_Led, OUTPUT);  //RGB-led
+  pinMode(speakerPin, OUTPUT);                              // выход спикера
+  pinMode(ACpin, INPUT);                                    // Вход аналогового компаратора для ключей RFID и аналоговых ключей Cyfral / Metacom
+//  pinMode(ibutton_led, OUTPUT);                                            // LED лузы ibutton
+  pinMode(R_Led, OUTPUT); pinMode(G_Led, OUTPUT); pinMode(B_Led, OUTPUT);  // RGB-led
   clearLed();
   pinMode(FreqGen, OUTPUT);                               
   digitalWrite(B_Led, HIGH);                                //awaiting of origin key data
-  Serial.begin(115200);
+//   digitalWrite(ibutton_led, LOW);                          //enable of ibutton LED
+  Serial.begin(115200);                                     // включаем передачу данныхв COM-порт на скорости 115200
   Sd_StartOK();
 }
 
@@ -405,7 +401,7 @@ bool searchEM_Marine( bool copyKey = true){
   l2:
   if (!CheckL)
     if (!copyKey) TCCR2A &=0b00111111;              //Оключить ШИМ COM2A (pin 11). Для настройки катушки в резонанс установите CheckL в 1
-  digitalWrite(G_Led, gr);
+   digitalWrite(G_Led, gr);
   return rez;
 }
 
@@ -565,7 +561,7 @@ void loop() {
   }
   if (writeflag && readflag){
     if (keyType == keyEM_Marie) write2rfid();
-      else write2iBtn();
+      else  write2iBtn(); 
   }
   delay(200);
 }
